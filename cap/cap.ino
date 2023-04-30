@@ -14,6 +14,8 @@ PS2Keyboard keyboard;
 #define MAX_AMPS 500    //in mA
 
 CRGB leds[NUM_LEDS];
+String barcodeData = "";
+bool dataComplete = false;
 
 void setup() {
   FastLED.addLeds<CHIPSET,DATA_PIN,COLOR_ORDER>(leds,NUM_LEDS);
@@ -22,6 +24,7 @@ void setup() {
   FastLED.clear();
   FastLED.show();
   keyboard.begin(DataPin, IRQpin, PS2Keymap_US);
+  //maybe use usb host
  
   //testing code remove after done testing 
   Serial.begin(9600);
@@ -30,11 +33,29 @@ void setup() {
 }
 
 void loop() {
+  
   if (keyboard.available()) {
     char c = keyboard.read();
-   }
-  Serial.print(c);
+    barcodeData += c;
+    if(c == '\n'){
+      dataComplete == true;
+    }
+  }
+  
+  if(dataComplete){
+    //need to call webservice and base suc or fail on that
+    //if suc
+    setLEDS(1);
+    //if fail
+    //setLEDS(2);
+    delay(.5);
+    setLEDS(0);
+    dataComplete = false;
+    Serial.println(barcodeData);
+    barcodeData = "";
 
+  }
+  
 }
 // 1 blue success, 2 red fail, 3 Green charge, else off
 void setLEDS(int color) {
