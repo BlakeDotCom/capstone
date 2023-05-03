@@ -1,10 +1,7 @@
+
 #include <FastLED.h>
-#include <PS2Keyboard.h>
-
-const int DataPin = 8;
-const int IRQpin =  5;
-PS2Keyboard keyboard;
-
+#define CLOCK 6 //D-
+#define DATA 7  //D+
 #define NUM_LEDS 60       // ??
 #define DATA_PIN 2
 #define COLOR_ORDER RGB
@@ -18,43 +15,32 @@ String barcodeData = "";
 bool dataComplete = false;
 
 void setup() {
+  delay(1000);
   FastLED.addLeds<CHIPSET,DATA_PIN,COLOR_ORDER>(leds,NUM_LEDS);
-  FastLED.setMaxPowerInVoltsaAndMilliamps(VOLTAGE,MAX_AMPS);
+  FastLED.setMaxPowerInVoltsAndMilliamps(VOLTAGE,MAX_AMPS);
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear();
   FastLED.show();
-  keyboard.begin(DataPin, IRQpin, PS2Keymap_US);
-  //maybe use usb host
- 
-  //testing code remove after done testing 
-  Serial.begin(9600);
-  Serial.println("International Keyboard Test:");
-   //testing code remove after done testing 
-}
 
+  Serial.begin(9600);
+  attachInterrupt(CLOCK, scan, FALLING);
+}
+uint8_t lastscan;
+
+void scan() {
+  volatile int scanval = 0;
+  for(int i = 0; i<11; i++)
+  {
+    while(digitalRead(CLOCK));
+    scanval |= digitalRead(DATA) << i;
+    while(!digitalRead(CLOCK));
+  }
+  scanval = (scanval>>1) & 255;
+  Serial.println(scanval);
+  lastscan = scanval;
+}
 void loop() {
   
-  if (keyboard.available()) {
-    char c = keyboard.read();
-    barcodeData += c;
-    if(c == '\n'){
-      dataComplete == true;
-    }
-  }
-  
-  if(dataComplete){
-    //need to call webservice and base suc or fail on that
-    //if suc
-    setLEDS(1);
-    //if fail
-    //setLEDS(2);
-    delay(.5);
-    setLEDS(0);
-    dataComplete = false;
-    Serial.println(barcodeData);
-    barcodeData = "";
-
-  }
   
 }
 // 1 blue success, 2 red fail, 3 Green charge, else off
