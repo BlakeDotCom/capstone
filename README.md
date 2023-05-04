@@ -9,8 +9,8 @@ sudo pip3 install adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
 ```
 3. Clone repo and run
-> git clone https://github.com/BlakeDotCom/capstone
 ```bash
+git clone https://github.com/BlakeDotCom/capstone
 cd /path/to/clonelocation
 sudo python cap.py &
 ```
