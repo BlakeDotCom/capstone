@@ -3,7 +3,7 @@
 
 2. Install libraries
 ```bash
-sudo pip install opencv-contrib-python
+sudo pip3 install opencv-contrib-python
 sudo pip3 install rpi_ws281x 
 sudo pip3 install adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
